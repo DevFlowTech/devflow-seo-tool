@@ -34,20 +34,22 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-card-border/60 bg-background/80 backdrop-blur-md transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-card-border/40 bg-background/70 backdrop-blur-xl transition-all duration-350 shadow-[0_1px_15px_rgba(0,0,0,0.4)]">
       <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 font-sans text-xl tracking-tight">
-          <Wrench className="h-6 w-6 text-primary" />
-          <span className="font-extrabold text-foreground">
-            DevFlow <span className="text-accent font-black">SEO</span>
-            <span className="text-muted-foreground text-sm font-medium ml-1">Tool</span>
+        <Link href="/" className="flex items-center gap-2.5 font-sans text-xl tracking-tight group hover:scale-[1.01] transition-transform duration-200">
+          <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-[0_0_15px_rgba(163,230,53,0.1)]">
+            <Wrench className="h-5 w-5" />
+          </div>
+          <span className="font-extrabold text-foreground tracking-tight select-none">
+            DevFlow <span className="text-accent font-black glowing-text">SEO</span>
+            <span className="text-muted-foreground/60 text-xs font-mono font-medium ml-1.5 px-1.5 py-0.5 rounded bg-card-border/30 border border-card-border/50">v1.0</span>
           </span>
         </Link>
 
         {/* DESKTOP NAV */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => {
             const isActive = 
               link.href === "/" 
@@ -60,16 +62,19 @@ export function Navbar() {
                   <button
                     onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
                     className={cn(
-                      "flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary cursor-pointer",
-                      isActive ? "text-primary font-semibold" : "text-muted-foreground"
+                      "flex items-center gap-1.5 text-xs uppercase font-mono tracking-wider transition-colors hover:text-primary cursor-pointer py-1 relative",
+                      isActive ? "text-primary font-bold" : "text-muted-foreground"
                     )}
                   >
                     {link.label}
-                    <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isMegaMenuOpen && "transform rotate-180")} />
+                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-300", isMegaMenuOpen && "transform rotate-180")} />
+                    {isActive && (
+                      <span className="absolute bottom-[-18px] left-0 right-0 h-[2px] bg-primary rounded shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
+                    )}
                   </button>
                   {isMegaMenuOpen && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 top-10 w-screen max-w-5xl px-4 animate-fadeIn">
-                      <MegaMenu onClose={() => setIsMegaMenuOpen(false)} />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 top-11 w-screen max-w-5xl px-4 animate-fadeIn">
+                      <MegaMenu onClose={() => setIsMegaMenuOpen(false)} className="glass-panel" />
                     </div>
                   )}
                 </div>
@@ -81,11 +86,14 @@ export function Navbar() {
                 key={link.label}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isActive ? "text-primary font-semibold" : "text-muted-foreground"
+                  "text-xs uppercase font-mono tracking-wider transition-colors hover:text-primary py-1 relative",
+                  isActive ? "text-primary font-bold" : "text-muted-foreground"
                 )}
               >
                 {link.label}
+                {isActive && (
+                  <span className="absolute bottom-[-18px] left-0 right-0 h-[2px] bg-primary rounded shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
+                )}
               </Link>
             );
           })}
