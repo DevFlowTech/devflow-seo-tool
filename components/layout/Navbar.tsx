@@ -34,22 +34,21 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-card-border/40 bg-background/70 backdrop-blur-xl transition-all duration-350 shadow-[0_1px_15px_rgba(0,0,0,0.4)]">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-sm transition-colors duration-200">
       <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2.5 font-sans text-xl tracking-tight group hover:scale-[1.01] transition-transform duration-200">
-          <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-[0_0_15px_rgba(163,230,53,0.1)]">
-            <Wrench className="h-5 w-5" />
-          </div>
-          <span className="font-extrabold text-foreground tracking-tight select-none">
-            DevFlow <span className="text-accent font-black glowing-text">SEO</span>
-            <span className="text-muted-foreground/60 text-xs font-mono font-medium ml-1.5 px-1.5 py-0.5 rounded bg-card-border/30 border border-card-border/50">v1.0</span>
+        <Link href="/" className="flex items-center gap-3 font-sans text-lg tracking-tight group">
+          <span className="font-mono text-xs px-2 py-1 border border-foreground/80 bg-foreground text-background font-bold tracking-widest select-none">
+            DF/SEO
+          </span>
+          <span className="font-light text-foreground select-none">
+            DevFlow <span className="font-medium">SEO</span>
           </span>
         </Link>
 
         {/* DESKTOP NAV */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => {
             const isActive = 
               link.href === "/" 
@@ -62,19 +61,16 @@ export function Navbar() {
                   <button
                     onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
                     className={cn(
-                      "flex items-center gap-1.5 text-xs uppercase font-mono tracking-wider transition-colors hover:text-primary cursor-pointer py-1 relative",
-                      isActive ? "text-primary font-bold" : "text-muted-foreground"
+                      "flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider transition-colors hover:text-foreground cursor-pointer py-1 relative",
+                      isActive ? "text-foreground font-semibold" : "text-muted-foreground"
                     )}
                   >
                     {link.label}
-                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-300", isMegaMenuOpen && "transform rotate-180")} />
-                    {isActive && (
-                      <span className="absolute bottom-[-18px] left-0 right-0 h-[2px] bg-primary rounded shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
-                    )}
+                    <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", isMegaMenuOpen && "transform rotate-180")} />
                   </button>
                   {isMegaMenuOpen && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 top-11 w-screen max-w-5xl px-4 animate-fadeIn">
-                      <MegaMenu onClose={() => setIsMegaMenuOpen(false)} className="glass-panel" />
+                    <div className="absolute left-1/2 transform -translate-x-1/2 top-10 w-screen max-w-5xl px-4 animate-fadeIn">
+                      <MegaMenu onClose={() => setIsMegaMenuOpen(false)} className="glass-panel rounded-none border border-border" />
                     </div>
                   )}
                 </div>
@@ -86,14 +82,11 @@ export function Navbar() {
                 key={link.label}
                 href={link.href}
                 className={cn(
-                  "text-xs uppercase font-mono tracking-wider transition-colors hover:text-primary py-1 relative",
-                  isActive ? "text-primary font-bold" : "text-muted-foreground"
+                  "text-[11px] font-mono uppercase tracking-wider transition-colors hover:text-foreground py-1 relative",
+                  isActive ? "text-foreground font-semibold" : "text-muted-foreground"
                 )}
               >
                 {link.label}
-                {isActive && (
-                  <span className="absolute bottom-[-18px] left-0 right-0 h-[2px] bg-primary rounded shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
-                )}
               </Link>
             );
           })}

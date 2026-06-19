@@ -95,169 +95,122 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full gap-16 pb-20 font-sans">
       
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden pt-24 pb-20 md:pt-36 md:pb-32 border-b border-card-border/40 bg-radial-[at_50%_0%] from-card/30 via-background to-background">
-        {/* Soft glowing ambient backgrounds */}
-        <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-primary/5 via-accent/2 to-transparent pointer-events-none filter blur-3xl animate-pulse-glow" />
-        <div className="absolute top-1/4 left-1/4 h-[300px] w-[300px] bg-primary/3 rounded-full pointer-events-none filter blur-3xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(163,230,53,0.012)_1px,transparent_1px),linear-gradient(to_bottom,rgba(163,230,53,0.012)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+      {/* 1. TYPOGRAPHIC HERO SECTION */}
+      <section className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-28 border-b border-border">
+        {/* Very subtle grid lines */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:5rem_5rem]" />
         
-        <div className="container mx-auto px-4 md:px-6 relative flex flex-col lg:flex-row items-center gap-16">
-          {/* Left Text Column */}
-          <div className="flex-1 space-y-6 text-left animate-fadeIn">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4.5 py-1 text-[10px] font-mono uppercase tracking-widest text-primary shadow-[0_0_15px_rgba(163,230,53,0.05)]">
-              <Sparkles className="h-3.5 w-3.5" />
-              Developer SEO Diagnostics
-            </div>
-            
-            <h1 className="text-5xl font-light tracking-tight sm:text-6xl md:text-7xl text-foreground leading-[1.02]">
-              DevFlow <span className="font-extrabold text-primary glowing-text">SEO</span>
-            </h1>
-            
-            <p className="text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed font-light">
-              An open-source, high-performance toolkit for real-time search engine diagnostics. Audit key word structure, index status, and link profiles instantly.
-            </p>
+        <div className="container mx-auto px-4 md:px-6 relative max-w-4xl text-center space-y-8 animate-fadeIn">
+          
+          <div className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground/80">
+            <span>[ SYSTEM WORKSPACE ]</span>
+          </div>
+          
+          <h1 className="text-4xl font-light tracking-tight sm:text-6xl md:text-7xl text-foreground leading-[1.05]">
+            DevFlow <span className="font-medium text-accent">SEO</span> Engine
+          </h1>
+          
+          <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed font-light font-sans">
+            A precise, high-performance toolkit for search engine diagnostics. Analyze canonical elements, crawl structures, and meta tags instantly in a unified, minimalistic console workspace.
+          </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-4">
-              <Link href="/tools">
-                <Button size="md" className="gap-2.5 cursor-pointer rounded-lg font-mono text-xs uppercase tracking-wider px-6 shadow-[0_4px_20px_rgba(163,230,53,0.2)] hover:shadow-[0_4px_30px_rgba(163,230,53,0.35)] transition-all">
-                  Launch Console
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
-              <Link href="/about">
-                <Button size="md" variant="outline" className="cursor-pointer rounded-lg font-mono text-xs uppercase tracking-wider px-6 border-card-border hover:bg-card-border/30 hover:border-primary/20 transition-all">
-                  Documentation
-                </Button>
-              </Link>
-            </div>
+          <div className="flex items-center justify-center gap-4 pt-2">
+            <Link href="/tools">
+              <Button size="sm" className="h-9 px-5 rounded-none font-mono text-[10px] tracking-wider bg-foreground text-background hover:bg-foreground/95 transition-all">
+                LAUNCH CONSOLE
+              </Button>
+            </Link>
+            <Link href="/about">
+              <Button size="sm" variant="outline" className="h-9 px-5 rounded-none font-mono text-[10px] tracking-wider border-border hover:bg-white/5 transition-all">
+                DOCUMENTATION
+              </Button>
+            </Link>
           </div>
 
-          {/* Right Interface Console Mock */}
-          <div className="flex-1 w-full max-w-md lg:max-w-none flex items-center justify-center animate-fadeIn [animation-delay:200ms]">
-            <div className="relative w-full aspect-video rounded-xl border border-card-border/80 bg-[#070709]/95 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden font-mono text-xs text-muted-foreground scanlines">
-              {/* Glow Behind Terminal */}
-              <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-primary/10 filter blur-3xl pointer-events-none" />
-              
-              {/* Top Bar */}
-              <div className="flex items-center justify-between border-b border-card-border/40 pb-4 mb-5">
-                <div className="flex items-center gap-2">
-                  <div className="h-2.5 w-2.5 rounded-full bg-destructive/60 hover:bg-destructive transition-colors duration-150" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-warning/60 hover:bg-warning transition-colors duration-150" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-primary/60 hover:bg-primary transition-colors duration-150" />
-                </div>
-                <div className="text-[10px] text-muted-foreground/50 select-none flex items-center gap-2 tracking-wide font-semibold uppercase">
-                  <Terminal className="h-3.5 w-3.5 text-primary" />
-                  Console://audit-system
-                </div>
-                <div className="w-8" />
+          {/* Minimalist Live Status Ticker */}
+          <div className="max-w-md mx-auto border border-border bg-card/25 p-4 text-left font-mono text-[10px] text-muted-foreground space-y-2 mt-6">
+            <div className="flex items-center justify-between border-b border-border/50 pb-2 text-[9px] uppercase tracking-wider font-bold">
+              <span>SCAN STREAMER</span>
+              <span className="flex items-center gap-1 text-accent">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                LIVE
+              </span>
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span>$ devflow --analyze https://{consoleSteps[stepIndex].domain}</span>
+                <span className="text-foreground">{consoleSteps[stepIndex].score}/100</span>
               </div>
-
-              {/* Console Body */}
-              <div className="space-y-4 font-mono">
-                <div className="flex items-center gap-2 text-foreground">
-                  <span className="text-primary font-bold animate-pulse">$</span>
-                  <span>devflow --analyze https://{consoleSteps[stepIndex].domain}</span>
-                  {logIndex === 0 && <span className="w-1.5 h-3.5 bg-primary animate-pulse" />}
-                </div>
-                
-                <div className="text-[11px] text-muted-foreground/80 space-y-2.5 min-h-[90px]">
-                  {currentLogs.map((log, i) => (
-                    <div key={i} className={cn(
-                      "transition-all duration-300",
-                      i === currentLogs.length - 1 && "text-primary font-bold glowing-text"
-                    )}>
-                      &gt; {log}
-                    </div>
-                  ))}
-                  {!isTyping && logIndex < consoleSteps[stepIndex].logs.length && (
-                    <div className="flex items-center gap-1.5">
-                      <span>&gt;</span>
-                      <span className="w-1 h-3.5 bg-muted-foreground/40 animate-pulse" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Score bar */}
-                <div className={cn(
-                  "border border-card-border/60 rounded-lg p-3 bg-card/60 flex items-center justify-between mt-3 transition-all duration-500 shadow-inner",
-                  logIndex === consoleSteps[stepIndex].logs.length ? "opacity-100 translate-y-0 border-primary/20 bg-primary/[0.02]" : "opacity-30 translate-y-1"
-                )}>
-                  <div className="space-y-0.5 text-left">
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-foreground">SEO Health Index</div>
-                    <div className="text-[9px] text-muted-foreground/50">Diagnostics check completed</div>
-                  </div>
-                  <div className="text-xl font-black text-primary glowing-text">
-                    {consoleSteps[stepIndex].score}/100
-                  </div>
-                </div>
+              <div className="text-[9px] text-muted-foreground/60">
+                &gt; {consoleSteps[stepIndex].logs[logIndex % consoleSteps[stepIndex].logs.length]}
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
-      {/* 2. STATS BAR */}
-      <section className="container mx-auto px-4 md:px-6 relative z-10 -mt-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 rounded-2xl border border-card-border bg-[#09090b]/80 backdrop-blur-md shadow-2xl">
+      {/* 2. SWISS STATS BAR */}
+      <section className="container mx-auto px-4 md:px-6 relative z-10 -mt-px">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-l border-r border-b border-border bg-background">
           {[
-            { label: "18+ Mod Console Apps", desc: "Zero subscriptions, configs, or gates" },
-            { label: "Real-time Audits", desc: "Live scraper crawls and page loads" },
-            { label: "NPM Companion CLI", desc: "Run scans directly in local terminals" },
-            { label: "Privacy Core First", desc: "Strictly client-bound, zero tracking" }
+            { label: "18 MODULAR SUITES", desc: "No subscriptions or logins required" },
+            { label: "REAL-TIME CRAWLS", desc: "Instant page header scrapers" },
+            { label: "COMPANION CLI", desc: "Run scans directly in terminal" },
+            { label: "100% PRIVATE", desc: "No tracker cookies or storage logs" }
           ].map((stat, i) => (
-            <div key={i} className="flex flex-col p-4.5 rounded-xl border border-transparent hover:border-card-border/50 hover:bg-card/30 transition-all duration-300 text-left">
-              <span className="text-xs font-mono uppercase tracking-wider text-primary font-extrabold glowing-text">
+            <div key={i} className="flex flex-col p-6 border-b lg:border-b-0 border-r last:border-r-0 border-border text-left">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-foreground font-semibold">
                 {stat.label}
               </span>
-              <span className="text-xs text-muted-foreground/75 mt-2 font-light leading-relaxed">{stat.desc}</span>
+              <span className="text-xs text-muted-foreground/80 mt-1.5 font-light leading-relaxed">{stat.desc}</span>
             </div>
           ))}
         </div>
       </section>
  
       {/* 3. TOOLS GRID SECTION */}
-      <section id="tools" className="container mx-auto px-4 md:px-6 space-y-10 relative z-10 pt-6">
-        <div className="text-left space-y-3 border-l-3 border-primary pl-5">
-          <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            SEO Console Suites
+      <section id="tools" className="container mx-auto px-4 md:px-6 space-y-10 pt-16 relative z-10">
+        <div className="text-left space-y-2 max-w-2xl">
+          <h2 className="text-2xl font-light tracking-tight text-foreground sm:text-3xl">
+            SEO CONSOLE <span className="font-semibold text-accent">SUITES</span>
           </h2>
-          <p className="text-sm text-muted-foreground/80 font-light max-w-xl leading-relaxed">
-            Select a modular tool from our diagnostic categories below to inspect indexing, meta structures, or page performance.
+          <p className="text-xs text-muted-foreground/80 font-sans leading-relaxed">
+            Choose a specialized tool module from the system index below to audit indexing, metadata configuration, link profiles, or simulated engine rankings.
           </p>
         </div>
  
         {/* Tab Switcher */}
-        <div className="flex flex-wrap items-center justify-start gap-2.5 border-b border-card-border/30 pb-5">
+        <div className="flex flex-wrap items-center justify-start gap-1 border-b border-border pb-px">
           <button
             onClick={() => setActiveCategory("all")}
             className={cn(
-              "px-5 py-2 rounded-full text-xs font-mono tracking-wider uppercase transition-all cursor-pointer border",
+              "px-5 py-3 text-[10px] font-mono tracking-widest uppercase transition-all cursor-pointer border-b-2 -mb-px",
               activeCategory === "all"
-                ? "bg-primary text-primary-foreground border-primary font-bold shadow-[0_4px_15px_rgba(163,230,53,0.25)] scale-[1.02]"
-                : "border-card-border text-muted-foreground hover:text-foreground hover:bg-card-border/30"
+                ? "border-accent text-accent font-bold"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            All Tools
+            ALL
           </button>
           {CATEGORIES.map((cat) => (
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
               className={cn(
-                "px-5 py-2 rounded-full text-xs font-mono tracking-wider uppercase transition-all cursor-pointer border",
+                "px-5 py-3 text-[10px] font-mono tracking-widest uppercase transition-all cursor-pointer border-b-2 -mb-px",
                 activeCategory === cat.key
-                  ? "bg-primary text-primary-foreground border-primary font-bold shadow-[0_4px_15px_rgba(163,230,53,0.25)] scale-[1.02]"
-                  : "border-card-border text-muted-foreground hover:text-foreground hover:bg-card-border/30"
+                  ? "border-accent text-accent font-bold"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
-              {cat.name}
+              {cat.name.split(" ")[0].toUpperCase()}
             </button>
           ))}
         </div>
  
         {/* Grid List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-border border border-border">
           {filteredTools.map((tool) => (
             <ToolCard key={tool.slug} tool={tool} />
           ))}
@@ -265,16 +218,16 @@ export default function Home() {
       </section>
  
       {/* 4. WORKFLOW SECTION */}
-      <section className="border-t border-card-border/40 py-20 bg-gradient-to-b from-[#040406] to-background">
+      <section className="border-t border-border py-20 bg-background">
         <div className="container mx-auto px-4 md:px-6 space-y-16">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-extrabold text-foreground tracking-tight sm:text-4xl">System Workflow</h2>
-            <p className="text-sm text-muted-foreground/80 max-w-md mx-auto font-light leading-relaxed">
-              Get comprehensive search index audits and crawls in three operations.
+          <div className="text-left max-w-xl space-y-2">
+            <h2 className="text-2xl font-light text-foreground tracking-tight sm:text-3xl">SYSTEM WORKFLOW</h2>
+            <p className="text-xs text-muted-foreground/80 font-light leading-relaxed">
+              Verify website SEO performance through three precise steps.
             </p>
           </div>
  
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 border border-border bg-card/10">
             {[
               {
                 step: "01",
@@ -297,15 +250,12 @@ export default function Home() {
             ].map((step, idx) => {
               const Icon = step.icon;
               return (
-                <div key={idx} className="relative flex flex-col items-start text-left p-6.5 rounded-xl glow-card space-y-4">
-                  <span className="text-[10px] font-mono text-primary font-bold tracking-widest uppercase bg-primary/5 border border-primary/20 px-2 py-0.5 rounded">
-                    Step {step.step}
+                <div key={idx} className="relative flex flex-col items-start text-left p-8 border-b md:border-b-0 md:border-r last:border-none border-border space-y-4">
+                  <span className="text-[9px] font-mono text-accent font-bold tracking-widest uppercase">
+                    STEP {step.step}
                   </span>
-                  <div className="p-3 rounded-lg bg-card-border/40 text-primary border border-card-border/40">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h4 className="text-base font-bold text-foreground tracking-tight">{step.title}</h4>
-                  <p className="text-xs text-muted-foreground/80 leading-relaxed font-light">{step.desc}</p>
+                  <h4 className="text-sm font-semibold text-foreground tracking-tight">{step.title}</h4>
+                  <p className="text-xs text-muted-foreground/85 leading-relaxed font-sans font-light">{step.desc}</p>
                 </div>
               );
             })}
@@ -314,18 +264,18 @@ export default function Home() {
       </section>
  
       {/* 5. FAQ / Q&A SECTION FOR AEO & GEO OPTIMIZATION */}
-      <section className="border-t border-card-border/40 py-24 bg-background">
+      <section className="border-t border-border py-24 bg-background">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl space-y-16">
-          <div className="text-left space-y-3 border-l-3 border-primary pl-5">
-            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-              Frequently Asked Questions
+          <div className="text-left space-y-2">
+            <h2 className="text-2xl font-light tracking-tight text-foreground sm:text-3xl">
+              FREQUENTLY ASKED QUESTIONS
             </h2>
-            <p className="text-sm text-muted-foreground/80 font-light max-w-xl leading-relaxed">
-              Understand how the DevFlow engine, AEO integrations, and CLI diagnostics work under the hood.
+            <p className="text-xs text-muted-foreground/85 font-sans leading-relaxed">
+              Technical documentation regarding the DevFlow core diagnostic logic.
             </p>
           </div>
  
-          <div className="space-y-6">
+          <div className="space-y-px border border-border bg-border">
             {[
               {
                 q: "What is DevFlow SEO Tool?",
@@ -346,12 +296,12 @@ export default function Home() {
             ].map((faq, idx) => (
               <div
                 key={idx}
-                className="p-6.5 rounded-xl border border-card-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 transition-all duration-300 space-y-2.5 text-left"
+                className="p-8 bg-background hover:bg-card/20 transition-all duration-200 space-y-3 text-left"
               >
-                <h3 className="text-sm font-semibold font-mono text-primary flex items-start gap-2 tracking-tight">
-                  <span className="text-primary/50 font-bold select-none">Q:</span> {faq.q}
+                <h3 className="text-xs font-semibold font-mono text-foreground flex items-start gap-2 tracking-tight">
+                  <span className="text-accent font-bold select-none">&gt;</span> {faq.q}
                 </h3>
-                <p className="text-xs text-muted-foreground/80 leading-relaxed font-light pl-5">
+                <p className="text-xs text-muted-foreground/85 leading-relaxed font-sans font-light pl-5">
                   {faq.a}
                 </p>
               </div>
