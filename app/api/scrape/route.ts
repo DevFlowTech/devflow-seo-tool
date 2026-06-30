@@ -282,13 +282,55 @@ export async function GET(request: Request) {
     if (mode === "auto-audit") {
       const title = $("title").text().trim();
       const description = $('meta[name="description"]').attr("content") || $('meta[property="og:description"]').attr("content") || "";
-      const h1 = $("h1").text().trim();
+      const h1 = $("h1").first().text().trim();
       
       const hasNoindexMeta = $('meta[name="robots"]').attr("content")?.toLowerCase().includes("noindex") || false;
+      const canonical = $('link[rel="canonical"]').attr("href") || "";
+      const ogTitle = $('meta[property="og:title"]').attr("content") || "";
       
       const pageSpeedStart = Date.now();
       await axios.get(cleanUrl, { timeout: 4000 });
       const loadTimeSeconds = (Date.now() - pageSpeedStart) / 1000;
+
+      // Extract detailed headings
+      const headings: { tag: string; text: string }[] = [];
+      $("h1, h2, h3, h4, h5, h6").each((_, el) => {
+        headings.push({
+          tag: el.tagName.toUpperCase(),
+          text: $(el).text().replace(/\s+/g, " ").trim()
+        });
+      });
+
+      // Extract image stats
+      let totalImages = 0;
+      let missingAltImages = 0;
+      $("img").each((_, el) => {
+        totalImages++;
+        const alt = $(el).attr("alt");
+        if (alt === undefined || alt.trim() === "") {
+          missingAltImages++;
+        }
+      });
+
+      // Extract link stats
+      let totalLinks = 0;
+      let internalLinks = 0;
+      let externalLinks = 0;
+      $("a").each((_, el) => {
+        totalLinks++;
+        const href = $(el).attr("href") || "";
+        if (href.startsWith("http") && !href.includes(parsedUrl.hostname)) {
+          externalLinks++;
+        } else if (href.startsWith("/") || href.includes(parsedUrl.hostname)) {
+          internalLinks++;
+        }
+      });
+
+      // Extract word count
+      const clonedBody = $("body").clone();
+      clonedBody.find("script, style, iframe, noscript, header, footer, nav").remove();
+      const textContent = clonedBody.text().replace(/\s+/g, " ").trim();
+      const wordCount = textContent.split(" ").filter(w => w.length > 0).length;
 
       const checks = [
         { title: "Has Title Tag", status: title.length > 0 ? "success" : "fail", description: title.length > 0 ? `Found: ${title.substring(0, 50)}...` : "Missing <title> tag." },
@@ -296,13 +338,15 @@ export async function GET(request: Request) {
         { title: "Has H1 Heading", status: h1.length > 0 ? "success" : "warning", description: h1.length > 0 ? "H1 tag is present." : "Missing H1 heading." },
         { title: "Indexable (No noindex)", status: !hasNoindexMeta ? "success" : "fail", description: "Page is not blocked by noindex meta tags." },
         { title: "Page load speed optimal", status: loadTimeSeconds < 2.5 ? "success" : "warning", description: `Measures load latency (Server responded in ${loadTimeSeconds.toFixed(2)}s).` },
-        { title: "URL is accessible", status: response.status === 200 ? "success" : "fail", description: `HTTP ${response.status}` }
+        { title: "URL is accessible", status: response.status === 200 ? "success" : "fail", description: `HTTP ${response.status}` },
+        { title: "Canonical URL", status: canonical.length > 0 ? "success" : "warning", description: canonical.length > 0 ? "Canonical is set." : "Missing canonical tag." },
+        { title: "Image Alt Tags", status: missingAltImages === 0 ? "success" : "warning", description: missingAltImages === 0 ? "All images have alt tags." : `${missingAltImages} images missing alt tags.` }
       ];
 
       let score = 0;
       checks.forEach(c => {
-        if (c.status === "success") score += 16;
-        else if (c.status === "warning") score += 8;
+        if (c.status === "success") score += 12;
+        else if (c.status === "warning") score += 6;
       });
 
       const recommendations = checks
@@ -316,7 +360,20 @@ export async function GET(request: Request) {
       return NextResponse.json({
         score: Math.min(100, score + 4), // Normalize to ~100 max
         checks,
-        recommendations
+        recommendations,
+        details: {
+          wordCount,
+          totalImages,
+          missingAltImages,
+          totalLinks,
+          internalLinks,
+          externalLinks,
+          headings,
+          canonical,
+          ogTitle,
+          titleLength: title.length,
+          descriptionLength: description.length
+        }
       });
     }
 
