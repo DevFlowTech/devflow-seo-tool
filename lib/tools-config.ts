@@ -205,6 +205,51 @@ export const TOOLS: ToolMetadata[] = [
     category: "technical",
     iconName: "CheckSquare",
     color: "emerald"
+  },
+  {
+    id: "schema-generator",
+    name: "Schema Markup Generator",
+    slug: "schema-generator",
+    description: "Generate structured JSON-LD schema markup for Google Rich Snippets.",
+    category: "technical",
+    iconName: "Code",
+    color: "emerald"
+  },
+  {
+    id: "lighthouse-simulator",
+    name: "Lighthouse Performance Simulator",
+    slug: "lighthouse-simulator",
+    description: "Simulate mobile performance auditing under custom network throttling.",
+    category: "technical",
+    iconName: "Cpu",
+    color: "emerald"
+  },
+  {
+    id: "sitemap-generator",
+    name: "XML Sitemap Builder",
+    slug: "sitemap-generator",
+    description: "Crawl domains up to 30 pages to dynamically generate optimized sitemap files.",
+    category: "technical",
+    iconName: "Network",
+    color: "emerald"
+  },
+  {
+    id: "robots-generator",
+    name: "Robots.txt Builder & Tester",
+    slug: "robots-generator",
+    description: "Create standard robots.txt files and validate crawler directives against URLs.",
+    category: "technical",
+    iconName: "CheckSquare",
+    color: "emerald"
+  },
+  {
+    id: "keyword-gap",
+    name: "Keyword Gap Analyzer",
+    slug: "keyword-gap",
+    description: "Compare two domains side-by-side to identify missing keyword opportunities.",
+    category: "serp",
+    iconName: "Users",
+    color: "amber"
   }
 ];
 
