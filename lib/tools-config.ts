@@ -196,6 +196,15 @@ export const TOOLS: ToolMetadata[] = [
     category: "content",
     iconName: "Code",
     color: "blue"
+  },
+  {
+    id: "automatic-audit",
+    name: "Automatic SEO Audit",
+    slug: "automatic-audit",
+    description: "Run a comprehensive automated SEO audit to get actionable improvement suggestions.",
+    category: "technical",
+    iconName: "CheckSquare",
+    color: "emerald"
   }
 ];
 

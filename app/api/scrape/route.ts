@@ -278,6 +278,48 @@ export async function GET(request: Request) {
       });
     }
 
+    // 6. AUTO AUDIT MODE
+    if (mode === "auto-audit") {
+      const title = $("title").text().trim();
+      const description = $('meta[name="description"]').attr("content") || $('meta[property="og:description"]').attr("content") || "";
+      const h1 = $("h1").text().trim();
+      
+      const hasNoindexMeta = $('meta[name="robots"]').attr("content")?.toLowerCase().includes("noindex") || false;
+      
+      const pageSpeedStart = Date.now();
+      await axios.get(cleanUrl, { timeout: 4000 });
+      const loadTimeSeconds = (Date.now() - pageSpeedStart) / 1000;
+
+      const checks = [
+        { title: "Has Title Tag", status: title.length > 0 ? "success" : "fail", description: title.length > 0 ? `Found: ${title.substring(0, 50)}...` : "Missing <title> tag." },
+        { title: "Has Meta Description", status: description.length > 0 ? "success" : "warning", description: description.length > 0 ? "Meta description is present." : "Missing meta description." },
+        { title: "Has H1 Heading", status: h1.length > 0 ? "success" : "warning", description: h1.length > 0 ? "H1 tag is present." : "Missing H1 heading." },
+        { title: "Indexable (No noindex)", status: !hasNoindexMeta ? "success" : "fail", description: "Page is not blocked by noindex meta tags." },
+        { title: "Page load speed optimal", status: loadTimeSeconds < 2.5 ? "success" : "warning", description: `Measures load latency (Server responded in ${loadTimeSeconds.toFixed(2)}s).` },
+        { title: "URL is accessible", status: response.status === 200 ? "success" : "fail", description: `HTTP ${response.status}` }
+      ];
+
+      let score = 0;
+      checks.forEach(c => {
+        if (c.status === "success") score += 16;
+        else if (c.status === "warning") score += 8;
+      });
+
+      const recommendations = checks
+        .filter(c => c.status !== "success")
+        .map(c => `Fix: ${c.title} - ${c.description}`);
+
+      if (recommendations.length === 0) {
+        recommendations.push("Great job! No major SEO issues found on this page.");
+      }
+
+      return NextResponse.json({
+        score: Math.min(100, score + 4), // Normalize to ~100 max
+        checks,
+        recommendations
+      });
+    }
+
     return NextResponse.json({ error: "Invalid mode." }, { status: 400 });
 
   } catch (error: any) {
