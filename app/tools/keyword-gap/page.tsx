@@ -33,6 +33,7 @@ export default function KeywordGapPage() {
     targetUrl: string;
     competitorUrl: string;
     gaps: { keyword: string; url1Count: number; url2Count: number; gap: number }[];
+    competitorKeywords?: { keyword: string; count: number }[];
     summary: {
       totalUniqueKeywords1: number;
       totalUniqueKeywords2: number;
@@ -147,46 +148,85 @@ export default function KeywordGapPage() {
             </div>
           </Card>
 
-          {/* Keyword Gaps Table */}
-          <Card className="border-card-border/60 bg-card/40 backdrop-blur-xl p-6 space-y-4">
-            <h3 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <BarChart3 className="h-4 w-4 text-accent" />
-              Keyword Differences Matrix (Competitor vs Target)
-            </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Keyword Gaps Table */}
+            <Card className="border-card-border/60 bg-card/40 backdrop-blur-xl p-6 space-y-4">
+              <h3 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <BarChart3 className="h-4 w-4 text-accent" />
+                Keyword Differences Matrix (Competitor vs Target)
+              </h3>
 
-            <div className="overflow-x-auto border border-card-border rounded">
-              <table className="w-full text-xs font-light select-text">
-                <thead className="bg-[#09090b] font-mono text-[9px] uppercase tracking-wider text-muted-foreground border-b border-card-border">
-                  <tr>
-                    <th className="p-3 text-left">#</th>
-                    <th className="p-3 text-left">Keyword / Phrase</th>
-                    <th className="p-3 text-right">Target Freq</th>
-                    <th className="p-3 text-right">Competitor Freq</th>
-                    <th className="p-3 text-right">Difference Gap</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-card-border/50">
-                  {data.gaps.length > 0 ? (
-                    data.gaps.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-white/5 transition-colors">
-                        <td className="p-3 text-muted-foreground font-mono">{idx + 1}</td>
-                        <td className="p-3 font-semibold text-foreground">{item.keyword}</td>
-                        <td className="p-3 text-right text-rose-400 font-mono font-medium">{item.url1Count}</td>
-                        <td className="p-3 text-right text-[#a3e635] font-mono font-medium">{item.url2Count}</td>
-                        <td className="p-3 text-right text-amber-400 font-mono font-bold">+{item.gap}</td>
-                      </tr>
-                    ))
-                  ) : (
+              <div className="overflow-x-auto border border-card-border rounded">
+                <table className="w-full text-xs font-light select-text">
+                  <thead className="bg-[#09090b] font-mono text-[9px] uppercase tracking-wider text-muted-foreground border-b border-card-border">
                     <tr>
-                      <td colSpan={5} className="p-6 text-center text-muted-foreground">
-                        No keyword gaps identified. Both websites have similar keyword densities!
-                      </td>
+                      <th className="p-3 text-left">#</th>
+                      <th className="p-3 text-left">Keyword / Phrase</th>
+                      <th className="p-3 text-right">Target</th>
+                      <th className="p-3 text-right">Comp</th>
+                      <th className="p-3 text-right">Gap</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+                  </thead>
+                  <tbody className="divide-y divide-card-border/50">
+                    {data.gaps.length > 0 ? (
+                      data.gaps.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-white/5 transition-colors">
+                          <td className="p-3 text-muted-foreground font-mono">{idx + 1}</td>
+                          <td className="p-3 font-semibold text-foreground truncate max-w-[120px]" title={item.keyword}>{item.keyword}</td>
+                          <td className="p-3 text-right text-rose-400 font-mono">{item.url1Count}</td>
+                          <td className="p-3 text-right text-[#a3e635] font-mono">{item.url2Count}</td>
+                          <td className="p-3 text-right text-amber-400 font-mono font-bold">+{item.gap}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                          No keyword gaps identified. Both websites have similar keyword densities!
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+
+            {/* Competitor's Top Keywords Table */}
+            <Card className="border-card-border/60 bg-card/40 backdrop-blur-xl p-6 space-y-4">
+              <h3 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <BarChart3 className="h-4 w-4 text-accent" />
+                Competitor's Top Keywords (By Frequency)
+              </h3>
+
+              <div className="overflow-x-auto border border-card-border rounded">
+                <table className="w-full text-xs font-light select-text">
+                  <thead className="bg-[#09090b] font-mono text-[9px] uppercase tracking-wider text-muted-foreground border-b border-card-border">
+                    <tr>
+                      <th className="p-3 text-left">#</th>
+                      <th className="p-3 text-left">Keyword / Phrase</th>
+                      <th className="p-3 text-right">Frequency</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-card-border/50">
+                    {data.competitorKeywords && data.competitorKeywords.length > 0 ? (
+                      data.competitorKeywords.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-white/5 transition-colors">
+                          <td className="p-3 text-muted-foreground font-mono">{idx + 1}</td>
+                          <td className="p-3 font-semibold text-foreground truncate max-w-[150px]" title={item.keyword}>{item.keyword}</td>
+                          <td className="p-3 text-right text-[#a3e635] font-mono font-bold">{item.count}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={3} className="p-6 text-center text-muted-foreground">
+                          No competitor keywords parsed.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
 
         </div>
       )}

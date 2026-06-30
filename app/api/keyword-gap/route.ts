@@ -45,19 +45,29 @@ function tokenizeAndCount(text: string): Record<string, number> {
   return counts;
 }
 
-async function fetchPageText(url: string): Promise<string> {
+async function fetchPageTextWithBrowser(browser: any, url: string): Promise<string> {
   try {
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      },
-      timeout: 8000,
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', (req: any) => {
+      const resourceType = req.resourceType();
+      if (['image', 'stylesheet', 'font', 'media'].includes(resourceType)) {
+        req.abort();
+      } else {
+        req.continue();
+      }
     });
-    const $ = cheerio.load(response.data);
-    $("script, style, iframe, noscript, header, footer, nav").remove();
-    return $("body").text().replace(/\s+/g, " ").trim();
+
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    const text = await page.evaluate(() => {
+      const scripts = document.querySelectorAll('script, style, iframe, noscript, header, footer, nav');
+      scripts.forEach(s => s.remove());
+      return document.body.textContent || "";
+    });
+    await page.close();
+    return text.replace(/\s+/g, " ").trim();
   } catch (err) {
-    // If axios fails, we return an empty string
+    console.error(`Error scraping ${url}:`, err);
     return "";
   }
 }
@@ -87,13 +97,28 @@ export async function GET(request: Request) {
     return NextResponse.json(cachedData);
   }
 
+  let browser;
   try {
+    const puppeteer = (await import('puppeteer')).default;
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-zygote',
+        '--single-process'
+      ]
+    });
+
     const [text1, text2] = await Promise.all([
-      fetchPageText(cleanUrl1),
-      fetchPageText(cleanUrl2)
+      fetchPageTextWithBrowser(browser, cleanUrl1),
+      fetchPageTextWithBrowser(browser, cleanUrl2)
     ]);
 
     if (!text1 && !text2) {
+      await browser.close();
       return NextResponse.json({ error: "Failed to scrape both target and competitor URLs." }, { status: 500 });
     }
 
@@ -119,10 +144,16 @@ export async function GET(request: Request) {
       .sort((a, b) => b.gap - a.gap)
       .slice(0, 50); // top 50 keyword gaps
 
+    const competitorTopKeywords = Object.entries(counts2)
+      .map(([keyword, count]) => ({ keyword, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 30); // Top 30 keywords competitor is using
+
     const data = {
       targetUrl: cleanUrl1,
       competitorUrl: cleanUrl2,
       gaps: gapKeywords,
+      competitorKeywords: competitorTopKeywords,
       summary: {
         totalUniqueKeywords1: Object.keys(counts1).length,
         totalUniqueKeywords2: Object.keys(counts2).length,
@@ -131,8 +162,12 @@ export async function GET(request: Request) {
 
     apiCache.set(cacheKey, data);
 
+    await browser.close();
     return NextResponse.json(data);
   } catch (err: any) {
+    if (browser) {
+      try { await browser.close(); } catch {}
+    }
     console.error(err);
     return NextResponse.json({ error: err.message || "Failed to compare keyword profiles." }, { status: 500 });
   }
