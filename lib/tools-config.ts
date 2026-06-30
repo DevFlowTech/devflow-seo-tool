@@ -216,15 +216,6 @@ export const TOOLS: ToolMetadata[] = [
     color: "emerald"
   },
   {
-    id: "lighthouse-simulator",
-    name: "Lighthouse Performance Simulator",
-    slug: "lighthouse-simulator",
-    description: "Simulate mobile performance auditing under custom network throttling.",
-    category: "technical",
-    iconName: "Cpu",
-    color: "emerald"
-  },
-  {
     id: "sitemap-generator",
     name: "XML Sitemap Builder",
     slug: "sitemap-generator",
