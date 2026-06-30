@@ -1,97 +1,11 @@
-"use client";
- 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Search, Cpu, CheckCircle2, Terminal } from "lucide-react";
+import { Search, Cpu, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TOOLS, CATEGORIES, ToolCategory } from "@/lib/tools-config";
-import { ToolCard } from "@/components/tools/ToolCard";
-import { cn } from "@/lib/utils";
+import { TerminalTicker } from "@/components/home/TerminalTicker";
+import { ToolsConsole } from "@/components/home/ToolsConsole";
  
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState<ToolCategory | "all">("all");
- 
-  const filteredTools = TOOLS.filter((tool) => {
-    if (activeCategory === "all") return true;
-    return tool.category === activeCategory;
-  });
- 
-  // Dynamic terminal logs animation
-  const consoleSteps = [
-    {
-      domain: "github.com",
-      logs: [
-        "resolving dns records... [ok]",
-        "ssl status check: active (https)",
-        "crawling robots.txt & sitemap.xml... [1 sitemap found]",
-        "auditing meta tags index parameters... [completed]"
-      ],
-      score: 95
-    },
-    {
-      domain: "nextjs.org",
-      logs: [
-        "resolving dns records... [ok]",
-        "ssl status check: active (https)",
-        "crawling robots.txt & sitemap.xml... [2 sitemaps found]",
-        "auditing meta tags index parameters... [completed]"
-      ],
-      score: 98
-    },
-    {
-      domain: "wikipedia.org",
-      logs: [
-        "resolving dns records... [ok]",
-        "ssl status check: active (https)",
-        "crawling robots.txt & sitemap.xml... [no sitemap in robots.txt]",
-        "auditing meta tags index parameters... [completed]"
-      ],
-      score: 87
-    },
-    {
-      domain: "devflow.co.in",
-      logs: [
-        "resolving dns records... [ok]",
-        "ssl status check: active (https)",
-        "crawling robots.txt & sitemap.xml... [1 sitemap found]",
-        "auditing meta tags index parameters... [completed]"
-      ],
-      score: 92
-    }
-  ];
- 
-  const [stepIndex, setStepIndex] = useState(0);
-  const [currentLogs, setCurrentLogs] = useState<string[]>([]);
-  const [logIndex, setLogIndex] = useState(0);
-  const [isTyping, setIsTyping] = useState(true);
- 
-  useEffect(() => {
-    let logTimer: NodeJS.Timeout;
-    let transitionTimer: NodeJS.Timeout;
- 
-    const currentStep = consoleSteps[stepIndex];
- 
-    if (logIndex < currentStep.logs.length) {
-      setIsTyping(true);
-      logTimer = setTimeout(() => {
-        setCurrentLogs((prev) => [...prev, currentStep.logs[logIndex]]);
-        setLogIndex((prev) => prev + 1);
-        setIsTyping(false);
-      }, 700);
-    } else {
-      transitionTimer = setTimeout(() => {
-        setCurrentLogs([]);
-        setLogIndex(0);
-        setStepIndex((prev) => (prev + 1) % consoleSteps.length);
-      }, 3500);
-    }
- 
-    return () => {
-      clearTimeout(logTimer);
-      clearTimeout(transitionTimer);
-    };
-  }, [stepIndex, logIndex]);
- 
   return (
     <div className="flex flex-col w-full gap-16 pb-20 font-sans">
       
@@ -128,24 +42,7 @@ export default function Home() {
           </div>
 
           {/* Minimalist Live Status Ticker */}
-          <div className="max-w-md mx-auto border border-border bg-card/25 p-4 text-left font-mono text-[10px] text-muted-foreground space-y-2 mt-6">
-            <div className="flex items-center justify-between border-b border-border/50 pb-2 text-[9px] uppercase tracking-wider font-bold">
-              <span>SCAN STREAMER</span>
-              <span className="flex items-center gap-1 text-accent">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-                LIVE
-              </span>
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span>$ devflow --analyze https://{consoleSteps[stepIndex].domain}</span>
-                <span className="text-foreground">{consoleSteps[stepIndex].score}/100</span>
-              </div>
-              <div className="text-[9px] text-muted-foreground/60">
-                &gt; {consoleSteps[stepIndex].logs[logIndex % consoleSteps[stepIndex].logs.length]}
-              </div>
-            </div>
-          </div>
+          <TerminalTicker />
 
         </div>
       </section>
@@ -170,52 +67,7 @@ export default function Home() {
       </section>
  
       {/* 3. TOOLS GRID SECTION */}
-      <section id="tools" className="container mx-auto px-4 md:px-6 space-y-10 pt-16 relative z-10">
-        <div className="text-left space-y-2 max-w-2xl">
-          <h2 className="text-2xl font-light tracking-tight text-foreground sm:text-3xl">
-            SEO CONSOLE <span className="font-semibold text-accent">SUITES</span>
-          </h2>
-          <p className="text-xs text-muted-foreground/80 font-sans leading-relaxed">
-            Choose a specialized tool module from the system index below to audit indexing, metadata configuration, link profiles, or simulated engine rankings.
-          </p>
-        </div>
- 
-        {/* Tab Switcher */}
-        <div className="flex flex-wrap items-center justify-start gap-1 border-b border-border pb-px">
-          <button
-            onClick={() => setActiveCategory("all")}
-            className={cn(
-              "px-5 py-3 text-[10px] font-mono tracking-widest uppercase transition-all cursor-pointer border-b-2 -mb-px",
-              activeCategory === "all"
-                ? "border-accent text-accent font-bold"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            ALL
-          </button>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
-              className={cn(
-                "px-5 py-3 text-[10px] font-mono tracking-widest uppercase transition-all cursor-pointer border-b-2 -mb-px",
-                activeCategory === cat.key
-                  ? "border-accent text-accent font-bold"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {cat.name.split(" ")[0].toUpperCase()}
-            </button>
-          ))}
-        </div>
- 
-        {/* Grid List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredTools.map((tool) => (
-            <ToolCard key={tool.slug} tool={tool} />
-          ))}
-        </div>
-      </section>
+      <ToolsConsole />
  
       {/* 4. WORKFLOW SECTION */}
       <section className="border-t border-border py-20 bg-background">
