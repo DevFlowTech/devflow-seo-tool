@@ -210,7 +210,7 @@ export default function Home() {
         </div>
  
         {/* Grid List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-border border border-border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredTools.map((tool) => (
             <ToolCard key={tool.slug} tool={tool} />
           ))}
