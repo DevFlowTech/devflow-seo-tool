@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, isValidUrl } from "@/lib/utils";
-import * as htmlToImage from "html-to-image";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const guideSteps = [
   {
@@ -74,43 +74,137 @@ export default function AutomaticAuditPage() {
   };
 
   const downloadPDF = async () => {
-    if (!reportRef.current) return;
+    if (!data) return;
     
-    const toastId = toast.loading("Generating PDF report...");
+    const toastId = toast.loading("Generating professional PDF report...");
     try {
-      const imgData = await htmlToImage.toJpeg(reportRef.current, {
-        quality: 1.0,
-        backgroundColor: "#09090b", // Match our app background
-        pixelRatio: 2
-      });
-      
-      // Get dimensions of the original element to calculate aspect ratio
-      const rect = reportRef.current.getBoundingClientRect();
-      const canvasWidth = rect.width * 2;
-      const canvasHeight = rect.height * 2;
-
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvasHeight * pdfWidth) / canvasWidth;
-      
-      let heightLeft = pdfHeight;
-      let position = 0;
+      const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      // Header
+      pdf.setFillColor(9, 9, 11); // Dark background header
+      pdf.rect(0, 0, pageWidth, 40, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(22);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("DevFlow SEO Audit Report", 14, 20);
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`Target URL: ${url}`, 14, 28);
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 34);
 
-      // Handle multi-page PDF if the report is very long
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-      heightLeft -= pageHeight;
+      // Score
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(16);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("SEO Health Score", 14, 55);
+      
+      pdf.setFontSize(36);
+      if (data.score > 80) pdf.setTextColor(39, 174, 96);
+      else if (data.score > 55) pdf.setTextColor(243, 156, 18);
+      else pdf.setTextColor(231, 76, 60);
+      pdf.text(`${data.score}/100`, 14, 70);
 
-      while (heightLeft >= 0) {
-        position = heightLeft - pdfHeight;
+      // Stats
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(12);
+      pdf.text(`Word Count: ${data.details.wordCount}`, 90, 60);
+      pdf.text(`Total Links: ${data.details.totalLinks} (${data.details.internalLinks} Internal, ${data.details.externalLinks} External)`, 90, 68);
+      pdf.text(`Total Images: ${data.details.totalImages} (${data.details.missingAltImages} missing alt text)`, 90, 76);
+
+      // Actionable Fixes
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Actionable Fix Suggestions", 14, 95);
+      
+      if (data.recommendations.length > 0) {
+        autoTable(pdf, {
+          startY: 100,
+          head: [['#', 'Suggestion']],
+          body: data.recommendations.map((rec, i) => [`${i + 1}`, rec]),
+          theme: 'striped',
+          headStyles: { fillColor: [41, 128, 185] },
+          styles: { fontSize: 10, cellPadding: 4 },
+          columnStyles: { 0: { cellWidth: 15 } }
+        });
+      }
+
+      // Detailed Checks
+      const nextY1 = (pdf as any).lastAutoTable ? (pdf as any).lastAutoTable.finalY + 15 : 110;
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Detailed Audit Checks", 14, nextY1);
+      
+      autoTable(pdf, {
+        startY: nextY1 + 5,
+        head: [['Status', 'Check', 'Description']],
+        body: data.checks.map(c => [c.status.toUpperCase(), c.title, c.description]),
+        theme: 'grid',
+        headStyles: { fillColor: [52, 73, 94] },
+        styles: { fontSize: 9 },
+        columnStyles: { 0: { cellWidth: 25, fontStyle: 'bold' }, 1: { cellWidth: 50 } },
+        didParseCell: function(cellData) {
+          if (cellData.section === 'body' && cellData.column.index === 0) {
+            if (cellData.cell.raw === 'SUCCESS') cellData.cell.styles.textColor = [39, 174, 96];
+            else if (cellData.cell.raw === 'WARNING') cellData.cell.styles.textColor = [243, 156, 18];
+            else cellData.cell.styles.textColor = [231, 76, 60];
+          }
+        }
+      });
+
+      // Headings Hierarchy
+      let nextY2 = (pdf as any).lastAutoTable.finalY + 15;
+      if (nextY2 > pageHeight - 30) {
         pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
+        nextY2 = 20;
+      }
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Heading Hierarchy", 14, nextY2);
+      
+      const headingBody = data.details.headings.length > 0 
+        ? data.details.headings.map((h: any) => [`${'  '.repeat(parseInt(h.tag.replace('H', '')) - 1)}${h.tag}`, h.text])
+        : [['-', 'No headings found']];
+
+      autoTable(pdf, {
+        startY: nextY2 + 5,
+        head: [['Tag', 'Text']],
+        body: headingBody,
+        theme: 'plain',
+        styles: { fontSize: 9, cellPadding: 2 },
+        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 20 } }
+      });
+
+      // Connected Pages
+      let nextY3 = (pdf as any).lastAutoTable.finalY + 15;
+      
+      // Ensure we don't draw off the page
+      if (nextY3 > pageHeight - 30) {
+        pdf.addPage();
+        nextY3 = 20;
       }
       
-      pdf.save(`devflow-audit-${new URL(url).hostname}.pdf`);
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Connected Pages (Internal Links)", 14, nextY3);
       
-      toast.success("PDF generated successfully!", { id: toastId });
+      const connectedBody = data.details.connectedPages && data.details.connectedPages.length > 0
+        ? data.details.connectedPages.map((l: string) => [l])
+        : [['No internal links found']];
+
+      autoTable(pdf, {
+        startY: nextY3 + 5,
+        head: [['URL']],
+        body: connectedBody,
+        theme: 'striped',
+        headStyles: { fillColor: [149, 165, 166] },
+        styles: { fontSize: 8 }
+      });
+
+      pdf.save(`devflow-audit-${new URL(url).hostname}.pdf`);
+      toast.success("Professional PDF generated successfully!", { id: toastId });
     } catch (err) {
       console.error(err);
       toast.error("Failed to generate PDF.", { id: toastId });
