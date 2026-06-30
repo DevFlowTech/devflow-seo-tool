@@ -280,67 +280,149 @@ export async function GET(request: Request) {
 
     // 6. AUTO AUDIT MODE
     if (mode === "auto-audit") {
-      const title = $("title").text().trim();
-      const description = $('meta[name="description"]').attr("content") || $('meta[property="og:description"]').attr("content") || "";
-      const h1 = $("h1").first().text().trim();
-      
-      const hasNoindexMeta = $('meta[name="robots"]').attr("content")?.toLowerCase().includes("noindex") || false;
-      const canonical = $('link[rel="canonical"]').attr("href") || "";
-      const ogTitle = $('meta[property="og:title"]').attr("content") || "";
-      
-      const pageSpeedStart = Date.now();
-      await axios.get(cleanUrl, { timeout: 4000 });
-      const loadTimeSeconds = (Date.now() - pageSpeedStart) / 1000;
-
-      // Extract detailed headings
-      const headings: { tag: string; text: string }[] = [];
-      $("h1, h2, h3, h4, h5, h6").each((_, el) => {
-        headings.push({
-          tag: el.tagName.toUpperCase(),
-          text: $(el).text().replace(/\s+/g, " ").trim()
-        });
-      });
-
-      // Extract image stats
+      let title = "";
+      let description = "";
+      let h1 = "";
+      let hasNoindexMeta = false;
+      let canonical = "";
+      let ogTitle = "";
+      let headings: { tag: string; text: string }[] = [];
       let totalImages = 0;
       let missingAltImages = 0;
-      $("img").each((_, el) => {
-        totalImages++;
-        const alt = $(el).attr("alt");
-        if (alt === undefined || alt.trim() === "") {
-          missingAltImages++;
-        }
-      });
-
-      // Extract link stats
       let totalLinks = 0;
       let internalLinks = 0;
       let externalLinks = 0;
-      $("a").each((_, el) => {
-        totalLinks++;
-        const href = $(el).attr("href") || "";
-        if (href.startsWith("http") && !href.includes(parsedUrl.hostname)) {
-          externalLinks++;
-        } else if (href.startsWith("/") || href.includes(parsedUrl.hostname)) {
-          internalLinks++;
+      let wordCount = 0;
+      let loadTimeSeconds = 0;
+      let connectedPages: string[] = [];
+      let pageStatus = 200;
+      
+      try {
+        const puppeteer = (await import('puppeteer')).default;
+        const browser = await puppeteer.launch({
+          headless: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        });
+        const page = await browser.newPage();
+        
+        // Speed measurement
+        const pageSpeedStart = Date.now();
+        
+        // Navigate to the URL
+        const pageResponse = await page.goto(cleanUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+        if (pageResponse) {
+          pageStatus = pageResponse.status();
         }
-      });
+        loadTimeSeconds = (Date.now() - pageSpeedStart) / 1000;
 
-      // Extract word count
-      const clonedBody = $("body").clone();
-      clonedBody.find("script, style, iframe, noscript, header, footer, nav").remove();
-      const textContent = clonedBody.text().replace(/\s+/g, " ").trim();
-      const wordCount = textContent.split(" ").filter(w => w.length > 0).length;
+        // Extract data
+        const extracted = await page.evaluate((hostname) => {
+          const doc = document;
+          const metaTitle = doc.title.trim();
+          const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute("content") || 
+                           doc.querySelector('meta[property="og:description"]')?.getAttribute("content") || "";
+          
+          const firstH1 = doc.querySelector('h1')?.textContent?.trim() || "";
+          const robots = doc.querySelector('meta[name="robots"]')?.getAttribute("content")?.toLowerCase() || "";
+          const hasNoindex = robots.includes("noindex");
+          const canon = doc.querySelector('link[rel="canonical"]')?.getAttribute("href") || "";
+          const og = doc.querySelector('meta[property="og:title"]')?.getAttribute("content") || "";
+
+          const headingNodes = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+          const extractedHeadings = headingNodes.map(el => ({
+            tag: el.tagName.toUpperCase(),
+            text: el.textContent?.replace(/\s+/g, " ").trim() || ""
+          }));
+
+          const imgNodes = Array.from(doc.querySelectorAll('img'));
+          const imgTotal = imgNodes.length;
+          const imgMissingAlt = imgNodes.filter(img => {
+            const alt = img.getAttribute("alt");
+            return alt === null || alt.trim() === "";
+          }).length;
+
+          const aNodes = Array.from(doc.querySelectorAll('a'));
+          let linkTotal = 0;
+          let linkInt = 0;
+          let linkExt = 0;
+          let intUrls: string[] = [];
+
+          aNodes.forEach(a => {
+            linkTotal++;
+            const href = a.getAttribute("href") || "";
+            if (href.startsWith("http") && !href.includes(hostname)) {
+              linkExt++;
+            } else if (href.startsWith("/") || href.includes(hostname)) {
+              linkInt++;
+              // Build full URL for connected pages
+              try {
+                const fullUrl = new URL(href, window.location.origin).href;
+                if (!intUrls.includes(fullUrl)) {
+                  intUrls.push(fullUrl);
+                }
+              } catch (e) {}
+            }
+          });
+
+          // Word count
+          const clone = doc.body.cloneNode(true) as HTMLElement;
+          const tagsToRemove = ['SCRIPT', 'STYLE', 'IFRAME', 'NOSCRIPT', 'HEADER', 'FOOTER', 'NAV'];
+          const elementsToRemove = clone.querySelectorAll(tagsToRemove.join(', '));
+          elementsToRemove.forEach(el => el.remove());
+          
+          const text = clone.textContent?.replace(/\s+/g, " ").trim() || "";
+          const words = text.split(" ").filter(w => w.length > 0).length;
+
+          return {
+            title: metaTitle,
+            description: metaDesc,
+            h1: firstH1,
+            hasNoindexMeta: hasNoindex,
+            canonical: canon,
+            ogTitle: og,
+            headings: extractedHeadings,
+            totalImages: imgTotal,
+            missingAltImages: imgMissingAlt,
+            totalLinks: linkTotal,
+            internalLinks: linkInt,
+            externalLinks: linkExt,
+            wordCount: words,
+            connectedPages: intUrls.slice(0, 10) // Limit to top 10 for UI
+          };
+        }, parsedUrl.hostname);
+
+        await browser.close();
+
+        // Assign extracted data
+        title = extracted.title;
+        description = extracted.description;
+        h1 = extracted.h1;
+        hasNoindexMeta = extracted.hasNoindexMeta;
+        canonical = extracted.canonical;
+        ogTitle = extracted.ogTitle;
+        headings = extracted.headings;
+        totalImages = extracted.totalImages;
+        missingAltImages = extracted.missingAltImages;
+        totalLinks = extracted.totalLinks;
+        internalLinks = extracted.internalLinks;
+        externalLinks = extracted.externalLinks;
+        wordCount = extracted.wordCount;
+        connectedPages = extracted.connectedPages;
+        
+      } catch (error) {
+        console.error("Puppeteer error:", error);
+        return NextResponse.json({ error: "Failed to scrape site. Ensure it is accessible." }, { status: 500 });
+      }
 
       const checks = [
         { title: "Has Title Tag", status: title.length > 0 ? "success" : "fail", description: title.length > 0 ? `Found: ${title.substring(0, 50)}...` : "Missing <title> tag." },
         { title: "Has Meta Description", status: description.length > 0 ? "success" : "warning", description: description.length > 0 ? "Meta description is present." : "Missing meta description." },
         { title: "Has H1 Heading", status: h1.length > 0 ? "success" : "warning", description: h1.length > 0 ? "H1 tag is present." : "Missing H1 heading." },
         { title: "Indexable (No noindex)", status: !hasNoindexMeta ? "success" : "fail", description: "Page is not blocked by noindex meta tags." },
-        { title: "Page load speed optimal", status: loadTimeSeconds < 2.5 ? "success" : "warning", description: `Measures load latency (Server responded in ${loadTimeSeconds.toFixed(2)}s).` },
-        { title: "URL is accessible", status: response.status === 200 ? "success" : "fail", description: `HTTP ${response.status}` },
+        { title: "Page load speed optimal", status: loadTimeSeconds < 5.0 ? "success" : "warning", description: `Measures load latency (Server responded in ${loadTimeSeconds.toFixed(2)}s).` },
+        { title: "URL is accessible", status: pageStatus === 200 ? "success" : "fail", description: `HTTP ${pageStatus}` },
         { title: "Canonical URL", status: canonical.length > 0 ? "success" : "warning", description: canonical.length > 0 ? "Canonical is set." : "Missing canonical tag." },
-        { title: "Image Alt Tags", status: missingAltImages === 0 ? "success" : "warning", description: missingAltImages === 0 ? "All images have alt tags." : `${missingAltImages} images missing alt tags.` }
+        { title: "Image Alt Tags", status: (totalImages > 0 && missingAltImages === 0) || totalImages === 0 ? "success" : "warning", description: missingAltImages === 0 ? "All images have alt tags." : `${missingAltImages} images missing alt tags.` }
       ];
 
       let score = 0;
@@ -372,7 +454,8 @@ export async function GET(request: Request) {
           canonical,
           ogTitle,
           titleLength: title.length,
-          descriptionLength: description.length
+          descriptionLength: description.length,
+          connectedPages
         }
       });
     }

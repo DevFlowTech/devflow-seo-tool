@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { Link2, Sparkles, CheckCircle2, XCircle, AlertTriangle, ListChecks, Download, FileText, Image as ImageIcon, Link as LinkIcon, Share2, AlignLeft } from "lucide-react";
+import { Link2, Sparkles, CheckCircle2, XCircle, AlertTriangle, ListChecks, Download, FileText, Image as ImageIcon, Link as LinkIcon, Share2, AlignLeft, Network, Play } from "lucide-react";
 import toast from "react-hot-toast";
 import { ToolLayout } from "@/components/tools/ToolLayout";
 import { LoadingSkeleton } from "@/components/tools/LoadingSkeleton";
@@ -317,6 +317,47 @@ export default function AutomaticAuditPage() {
                         </div>
                       );
                     })
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Connected Pages */}
+            <Card className="bg-card/30 border-card-border/60">
+              <CardHeader className="border-b border-card-border/30 pb-3">
+                <CardTitle className="text-base font-bold flex items-center gap-2">
+                  <Network className="h-4 w-4 text-primary" />
+                  Connected Pages (Internal Links)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="max-h-64 overflow-y-auto p-4 space-y-3">
+                  {!data.details.connectedPages || data.details.connectedPages.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No internal links discovered on this page.</p>
+                  ) : (
+                    data.details.connectedPages.map((internalUrl: string, i: number) => (
+                      <div key={i} className="flex items-center justify-between gap-3 bg-card/10 border border-card-border/40 p-3 rounded hover:border-card-border/80 transition-colors">
+                        <span className="text-xs font-mono text-muted-foreground truncate" title={internalUrl}>
+                          {internalUrl}
+                        </span>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-7 text-[10px] font-mono tracking-widest shrink-0"
+                          onClick={() => {
+                            setUrl(internalUrl);
+                            setTimeout(() => {
+                              // Programmatically submit the form by simulating a submit event
+                              const form = document.querySelector('form');
+                              if (form) form.requestSubmit();
+                            }, 100);
+                          }}
+                        >
+                          <Play className="h-3 w-3 mr-1.5" />
+                          AUDIT PAGE
+                        </Button>
+                      </div>
+                    ))
                   )}
                 </div>
               </CardContent>
