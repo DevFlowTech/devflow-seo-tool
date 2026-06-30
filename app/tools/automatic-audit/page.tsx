@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, isValidUrl } from "@/lib/utils";
-import html2canvas from "html2canvas";
+import * as htmlToImage from "html-to-image";
 import jsPDF from "jspdf";
 
 const guideSteps = [
@@ -78,16 +78,20 @@ export default function AutomaticAuditPage() {
     
     const toastId = toast.loading("Generating PDF report...");
     try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#09090b" // Match our app background
+      const imgData = await htmlToImage.toJpeg(reportRef.current, {
+        quality: 1.0,
+        backgroundColor: "#09090b", // Match our app background
+        pixelRatio: 2
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      // Get dimensions of the original element to calculate aspect ratio
+      const rect = reportRef.current.getBoundingClientRect();
+      const canvasWidth = rect.width * 2;
+      const canvasHeight = rect.height * 2;
+
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pdfHeight = (canvasHeight * pdfWidth) / canvasWidth;
       
       let heightLeft = pdfHeight;
       let position = 0;
