@@ -107,11 +107,11 @@ export default function Home() {
           </div>
           
           <h1 className="text-4xl font-light tracking-tight sm:text-6xl md:text-7xl text-foreground leading-[1.05]">
-            DevFlow <span className="font-medium text-accent">SEO</span> Engine
+            The Ultimate <span className="font-medium text-accent">Free SEO Tool</span>
           </h1>
           
           <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed font-light font-sans">
-            A precise, high-performance toolkit for search engine diagnostics. Analyze canonical elements, crawl structures, and meta tags instantly in a unified, minimalistic console workspace.
+            Stop paying for expensive subscriptions. DevFlow is a 100% free SEO tool suite providing high-performance search engine diagnostics. Analyze canonical elements, crawl structures, and meta tags instantly.
           </p>
 
           <div className="flex items-center justify-center gap-4 pt-2">

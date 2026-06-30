@@ -24,25 +24,23 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevFlow SEO Tool - Professional SEO Tools for Developers & Marketers",
+  title: "DevFlow SEO Tool - The Ultimate Free SEO Tools for Developers & Marketers",
   description:
-    "Analyze, optimize, and dominate search rankings with DevFlow's professional-grade SEO toolkit. 100% free and no registration required.",
+    "Looking for a powerful, 100% free SEO tool? Analyze websites, optimize content, and dominate search rankings with DevFlow's professional SEO tools. No signup required.",
   keywords: [
+    "free SEO tool",
+    "best free SEO tools",
+    "SEO analyzer",
+    "website SEO checker",
+    "technical SEO tools",
+    "free keyword research tool",
+    "DevFlow SEO",
     "SEO diagnostics",
-    "Developer SEO tools",
-    "SEO CLI tool",
-    "redirect chain tracer",
-    "WHOIS DNS records inspector",
-    "CSS selector scraper",
-    "crawlability test",
-    "meta tag extractor",
+    "Generative Engine Optimization",
+    "search engine optimization tools",
     "site audits",
     "index checker",
-    "JSON-LD schema generator",
-    "Generative Engine Optimization",
-    "GEO",
-    "Answer Engine Optimization",
-    "AEO"
+    "JSON-LD schema generator"
   ],
   icons: {
     icon: "/favicon.svg",
@@ -62,8 +60,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "DevFlow SEO Tool - Professional SEO Tools for Developers & Marketers",
-    description: "Analyze, optimize, and dominate search rankings with DevFlow's professional-grade SEO toolkit. 100% free and no registration required.",
+    title: "DevFlow SEO Tool - The Ultimate Free SEO Tools for Developers",
+    description: "Looking for a powerful, 100% free SEO tool? Analyze websites, optimize content, and dominate search rankings with DevFlow's professional SEO tools. No signup required.",
     url: "https://seo.devflow.co.in",
     siteName: "DevFlow SEO Tool",
     images: [
@@ -79,8 +77,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DevFlow SEO Tool - Professional SEO Tools for Developers & Marketers",
-    description: "Analyze, optimize, and dominate search rankings with DevFlow's professional-grade SEO toolkit. 100% free and no registration required.",
+    title: "DevFlow SEO Tool - The Ultimate Free SEO Tools",
+    description: "Looking for a powerful, 100% free SEO tool? Analyze websites and optimize content with DevFlow's professional SEO tools.",
     images: ["https://seo.devflow.co.in/favicon.svg"],
   },
 };
